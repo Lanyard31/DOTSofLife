@@ -28,8 +28,8 @@ public class NewDestinationSystem : SystemBase
             {
                 var random = randomArray[nativeThreadIndex];
 
-                destination.Value.x = random.NextFloat(0, 500);
-                destination.Value.z = random.NextFloat(0, 500);
+                //destination.Value.x = random.NextFloat(0, 500);
+                //destination.Value.z = random.NextFloat(0, 500);
 
                 randomArray[nativeThreadIndex] = random;
             }

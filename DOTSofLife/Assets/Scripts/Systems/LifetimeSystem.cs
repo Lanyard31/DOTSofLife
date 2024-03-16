@@ -21,7 +21,7 @@ public class LifetimeSystem : SystemBase
 
             if(lifetime.Value <= 0f)
             {
-                ecb.DestroyEntity(entityInQueryIndex, entity);
+                //ecb.DestroyEntity(entityInQueryIndex, entity);
             }
         }).ScheduleParallel();
 
