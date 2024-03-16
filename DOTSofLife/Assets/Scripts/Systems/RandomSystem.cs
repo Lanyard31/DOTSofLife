@@ -24,7 +24,7 @@ public class RandomSystem : SystemBase
         RandomArray = new NativeArray<Unity.Mathematics.Random>(randomArray, Allocator.Persistent);
     }
 
-    protected private void OnDestroy()
+    protected override void OnDestroy()
     {
         RandomArray.Dispose();
     }
