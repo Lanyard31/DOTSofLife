@@ -4,33 +4,80 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
+using Unity.Physics;
+using Unity.Physics.Systems;
+using UnityEngine;
+using System;
+using Unity.Rendering;
+using RaycastHit = Unity.Physics.RaycastHit;
 
+[AlwaysUpdateSystem]
 public class ClickToToggleSystem : SystemBase
 {
+    private Camera _mainCamera;
+    private BuildPhysicsWorld _buildPhysicsWorld;
+    private CollisionWorld _collisionWorld;
+
+    protected override void OnCreate()
+    {
+        _mainCamera = Camera.main;
+        _buildPhysicsWorld = World.GetOrCreateSystem<BuildPhysicsWorld>();
+    }
+
     protected override void OnUpdate()
     {
-        // Assign values to local variables captured in your job here, so that it has
-        // everything it needs to do its work when it runs later.
-        // For example,
-        //     float deltaTime = Time.DeltaTime;
 
-        // This declares a new kind of job, which is a unit of work to do.
-        // The job is declared as an Entities.ForEach with the target components as parameters,
-        // meaning it will process all entities in the world that have both
-        // Translation and Rotation components. Change it to process the component
-        // types you want.
+        if (Input.GetMouseButtonUp(0))
+        {
+            SelectSingleUnit();
+        }
+    }
         
-        
-        
-        Entities.ForEach((ref Translation translation, in Rotation rotation) => {
-            // Implement the work to perform for each entity here.
-            // You should only access data that is local or that is a
-            // field on this job. Note that the 'rotation' parameter is
-            // marked as 'in', which means it cannot be modified,
-            // but allows this job to run in parallel with other jobs
-            // that want to read Rotation component data.
-            // For example,
-            //     translation.Value += math.mul(rotation.Value, new float3(0, 0, 1)) * deltaTime;
-        }).Schedule();
+    private void SelectSingleUnit()
+    {
+        _collisionWorld = _buildPhysicsWorld.PhysicsWorld.CollisionWorld;
+
+        var ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
+        var rayStart = ray.origin;
+        var rayEnd = ray.GetPoint(10000f);
+
+        if(Raycast(rayStart, rayEnd, out var raycastHit))
+        {
+            var hitEntity = _buildPhysicsWorld.PhysicsWorld.Bodies[raycastHit.RigidBodyIndex].Entity;
+            if (EntityManager.HasComponent<PersonTag>(hitEntity))
+            {
+                if (EntityManager.HasComponent<LivingTag>(hitEntity))
+                {
+                    //make dead
+                    EntityManager.RemoveComponent<LivingTag>(hitEntity);
+                }
+                else
+                {
+                    //make alive
+                    EntityManager.AddComponent<LivingTag>(hitEntity);
+                    var emissionGroup = GetComponentDataFromEntity<URPMaterialPropertyEmissionColor>(false);
+                    var emissionComponent = emissionGroup[hitEntity];
+                    emissionComponent.Value.x = 0.1499598f;
+                    emissionComponent.Value.y = 0.8468735f;
+                    emissionComponent.Value.z = 0.8468735f;
+                    emissionGroup[hitEntity] = emissionComponent;
+                }
+            }
+        }
+    }
+
+    private bool Raycast(float3 rayStart, float3 rayEnd, out RaycastHit raycastHit)
+    {
+        var raycastInput = new RaycastInput
+        {
+            Start = rayStart,
+            End = rayEnd,
+            Filter = new CollisionFilter
+            {
+                BelongsTo = (uint) CollisionLayers.Selection,
+                CollidesWith = (uint) (CollisionLayers.Ground | CollisionLayers.Units)
+            }
+        };
+        return _collisionWorld.CastRay(raycastInput, out raycastHit);
     }
 }
