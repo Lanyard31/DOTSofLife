@@ -10,6 +10,7 @@ using UnityEngine;
 using System;
 using Unity.Rendering;
 using RaycastHit = Unity.Physics.RaycastHit;
+using UnityEngine.Rendering;
 
 [AlwaysUpdateSystem]
 public class ClickToToggleSystem : SystemBase
@@ -22,24 +23,36 @@ public class ClickToToggleSystem : SystemBase
     {
         _mainCamera = Camera.main;
         _buildPhysicsWorld = World.GetOrCreateSystem<BuildPhysicsWorld>();
+        GraphicsSettings.useScriptableRenderPipelineBatching = true;
     }
 
     protected override void OnUpdate()
     {
+        if (_mainCamera == null)
+        {
+            _mainCamera = Camera.main;
+        }
 
         if (Input.GetMouseButton(0))
         {
+            if (_buildPhysicsWorld != null && _buildPhysicsWorld.PhysicsWorld.Equals(default(PhysicsWorld)))
+            {
+                Debug.LogError("_buildPhysicsWorld.PhysicsWorld is null. Ensure it is properly initialized.");
+                return;
+            }
             SelectSingleUnit();
         }
     }
-        
+
     private void SelectSingleUnit()
     {
+
         _collisionWorld = _buildPhysicsWorld.PhysicsWorld.CollisionWorld;
+        //here is the culprit
 
         var ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
         var rayStart = ray.origin;
-        var rayEnd = ray.GetPoint(10000f);
+        var rayEnd = ray.GetPoint(2000f);
 
         if (Raycast(rayStart, rayEnd, out var raycastHit))
         {
@@ -52,7 +65,7 @@ public class ClickToToggleSystem : SystemBase
                     // Make dead
                     personTag.IsAlive = false;
                     EntityManager.SetComponentData(hitEntity, personTag);
-                    // Additional logic for making entity dead
+                    
                     var emissionGroup = GetComponentDataFromEntity<URPMaterialPropertyEmissionColor>(false);
                     var emissionComponent = emissionGroup[hitEntity];
                     emissionComponent.Value = new float4(0.0001f, 0, 0, 1f);
@@ -63,7 +76,9 @@ public class ClickToToggleSystem : SystemBase
                     // Make alive
                     personTag.IsAlive = true;
                     EntityManager.SetComponentData(hitEntity, personTag);
-                    // Additional logic for making entity alive
+
+                    Debug.Log("Should be alive and lighting up");
+
                     var emissionGroup = GetComponentDataFromEntity<URPMaterialPropertyEmissionColor>(false);
                     var emissionComponent = emissionGroup[hitEntity];
                     emissionComponent.Value = new float4(0.1499598f, 0.8468735f, 0.8468735f, 1f);

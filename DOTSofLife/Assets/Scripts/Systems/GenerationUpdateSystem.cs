@@ -8,6 +8,7 @@ using Unity.Rendering;
 using UnityEngine;
 using RaycastHit = Unity.Physics.RaycastHit;
 
+[AlwaysUpdateSystem]
 public class GenerationUpdateSystem : SystemBase
 {
     private EntityCommandBufferSystem entityCommandBufferSystem;
@@ -37,7 +38,7 @@ public class GenerationUpdateSystem : SystemBase
         PhysicsWorld physicsWorld = buildPhysicsWorldSystem.PhysicsWorld;
         var entityManager = EntityManager;
 
-        Entities.ForEach((Entity entity, int entityInQueryIndex, ref PersonTag personTag, in Translation translation) =>
+        Entities.ForEach((Entity entity, ref PersonTag personTag, in Translation translation) =>
         {
             int liveNeighborCount = 0;
 

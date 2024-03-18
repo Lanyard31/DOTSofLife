@@ -3,14 +3,14 @@
     "Components": [
         {
             "$type": "Unity.Build.Common.GeneralSettings, Unity.Build",
-            "ProductName": "Product Name",
-            "CompanyName": "Company Name",
+            "ProductName": "DOTS of Life",
+            "CompanyName": "Lanyard",
             "Version": "1.0.0"
         },
         {
             "$type": "Unity.Build.Common.SceneList, Unity.Build",
             "$version": 1,
-            "BuildCurrentScene": false,
+            "BuildCurrentScene": true,
             "SceneInfos": [
                 {
                     "Scene": "GlobalObjectId_V1-1-d1c3109bdb54ad54c8a2b2838528e640-102900000-0",
@@ -22,7 +22,7 @@
             "$type": "Unity.Build.Classic.ClassicBuildProfile, Unity.Build.Classic",
             "$version": 1,
             "Platform": "win",
-            "Configuration": 3
+            "Configuration": 2
         }
     ]
 }

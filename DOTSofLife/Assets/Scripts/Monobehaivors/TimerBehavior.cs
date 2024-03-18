@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TimerBehavior : MonoBehaviour
 {
-    public float totalTime = 1f;
+    public float totalTime = 0.4f;
     private float currentTime;
     public bool isActive = false;
 
@@ -16,7 +16,7 @@ public class TimerBehavior : MonoBehaviour
     void Update()
     {
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
         {
             ResetTimer();
         }
