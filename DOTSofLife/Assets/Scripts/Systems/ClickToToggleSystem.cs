@@ -41,31 +41,32 @@ public class ClickToToggleSystem : SystemBase
         var rayStart = ray.origin;
         var rayEnd = ray.GetPoint(10000f);
 
-        if(Raycast(rayStart, rayEnd, out var raycastHit))
+        if (Raycast(rayStart, rayEnd, out var raycastHit))
         {
             var hitEntity = _buildPhysicsWorld.PhysicsWorld.Bodies[raycastHit.RigidBodyIndex].Entity;
             if (EntityManager.HasComponent<PersonTag>(hitEntity))
             {
-                if (EntityManager.HasComponent<LivingTag>(hitEntity))
+                var personTag = EntityManager.GetComponentData<PersonTag>(hitEntity);
+                if (personTag.IsAlive)
                 {
-                    //make dead
-                    EntityManager.RemoveComponent<LivingTag>(hitEntity);
+                    // Make dead
+                    personTag.IsAlive = false;
+                    EntityManager.SetComponentData(hitEntity, personTag);
+                    // Additional logic for making entity dead
                     var emissionGroup = GetComponentDataFromEntity<URPMaterialPropertyEmissionColor>(false);
                     var emissionComponent = emissionGroup[hitEntity];
-                    emissionComponent.Value.x = 0.0001f;
-                    emissionComponent.Value.y = 0;
-                    emissionComponent.Value.z = 0;
+                    emissionComponent.Value = new float4(0.0001f, 0, 0, 1f);
                     emissionGroup[hitEntity] = emissionComponent;
                 }
                 else
                 {
-                    //make alive
-                    EntityManager.AddComponent<LivingTag>(hitEntity);
+                    // Make alive
+                    personTag.IsAlive = true;
+                    EntityManager.SetComponentData(hitEntity, personTag);
+                    // Additional logic for making entity alive
                     var emissionGroup = GetComponentDataFromEntity<URPMaterialPropertyEmissionColor>(false);
                     var emissionComponent = emissionGroup[hitEntity];
-                    emissionComponent.Value.x = 0.1499598f;
-                    emissionComponent.Value.y = 0.8468735f;
-                    emissionComponent.Value.z = 0.8468735f;
+                    emissionComponent.Value = new float4(0.1499598f, 0.8468735f, 0.8468735f, 1f);
                     emissionGroup[hitEntity] = emissionComponent;
                 }
             }

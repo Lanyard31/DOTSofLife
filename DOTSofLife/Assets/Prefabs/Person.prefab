@@ -16,8 +16,8 @@ GameObject:
   - component: {fileID: 4748477599452423746}
   - component: {fileID: 4509762734906772026}
   - component: {fileID: 1776054274269884685}
-  - component: {fileID: 7602514212026785943}
   - component: {fileID: 9216531212743063116}
+  - component: {fileID: 3607745664769563229}
   m_Layer: 0
   m_Name: Person
   m_TagString: Untagged
@@ -116,6 +116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f28bda81b012671468df1b3a63642e27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsAlive: 0
 --- !u!114 &4748477599452423746
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -322,19 +323,6 @@ MonoBehaviour:
     Tag05: 0
     Tag06: 0
     Tag07: 0
---- !u!114 &7602514212026785943
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4748477599452423800}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5817391f0fe73f468a54b3b55b68613, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Value: 0
 --- !u!114 &9216531212743063116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -352,3 +340,16 @@ MonoBehaviour:
     y: 0
     z: 0
     w: 0
+--- !u!114 &3607745664769563229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4748477599452423800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5817391f0fe73f468a54b3b55b68613, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Value: 0
