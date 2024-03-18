@@ -10,27 +10,32 @@ using RaycastHit = Unity.Physics.RaycastHit;
 
 public class GenerationUpdateSystem : SystemBase
 {
-    private const int minLivingCellsToStart = 3;
-    private int numberOfLivingCells;
-    private bool shouldRunLifeLogic = false;
     private EntityCommandBufferSystem entityCommandBufferSystem;
-    private float spread = 5f; //from spawner
+    private readonly float spread = 5f; //from spawner
     private BuildPhysicsWorld buildPhysicsWorldSystem;
+    private TimerBehavior timerBehavior;
 
     protected override void OnCreate()
     {
         entityCommandBufferSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         buildPhysicsWorldSystem = World.GetOrCreateSystem<BuildPhysicsWorld>();
+        GameObject timerObject = GameObject.Find("TimerObject");
+        if (timerObject != null)
+        {
+            timerBehavior = timerObject.GetComponent<TimerBehavior>();
+        }
     }
 
     protected override void OnUpdate()
     {
+        if (timerBehavior != null && timerBehavior.isActive == true)
+        {
+            return;
+        }
         var commandBuffer = entityCommandBufferSystem.CreateCommandBuffer();
         float localSpread = spread;
         PhysicsWorld physicsWorld = buildPhysicsWorldSystem.PhysicsWorld;
         var entityManager = EntityManager;
-        bool shouldRunLifeLogic = this.shouldRunLifeLogic;
-        int localNumberOfLivingCells = numberOfLivingCells;
 
         Entities.ForEach((Entity entity, int entityInQueryIndex, ref PersonTag personTag, in Translation translation) =>
         {
@@ -59,8 +64,7 @@ public class GenerationUpdateSystem : SystemBase
                         }
                     };
 
-                    RaycastHit hit;
-                    if (physicsWorld.CastRay(raycastInput, out hit))
+                    if (physicsWorld.CastRay(raycastInput, out RaycastHit hit))
                     {
                         var hitEntity = physicsWorld.Bodies[hit.RigidBodyIndex].Entity;
                         bool isAlive = false;
@@ -71,60 +75,35 @@ public class GenerationUpdateSystem : SystemBase
 
                         if (isAlive)
                         {
-                            Debug.Log($"FoundLivingNeighbor");
+                            //Debug.Log($"FoundLivingNeighbor");
                             liveNeighborCount++;
                         }
                     }
                 }
             }
 
-            if (liveNeighborCount > 0)
-            {
-                Debug.Log($"Length of liveNeighborCount: {liveNeighborCount}");
-            }
+            bool shouldBeAlive = (personTag.IsAlive && liveNeighborCount >= 2 && liveNeighborCount <= 3) || (!personTag.IsAlive && liveNeighborCount == 3);
+            personTag.shouldBeAlive = shouldBeAlive;
 
-            if (liveNeighborCount >= minLivingCellsToStart)
-            {
-                shouldRunLifeLogic = true;
-            }
-
-            else if (shouldRunLifeLogic && localNumberOfLivingCells < 1)
-            {
-                shouldRunLifeLogic = false;
-            }
-
-
-            if (shouldRunLifeLogic)
-            {
-                Debug.Log("Should run life logic!");
-                bool shouldBeAlive = (personTag.IsAlive && liveNeighborCount >= 2 && liveNeighborCount <= 3) || (!personTag.IsAlive && liveNeighborCount == 3);
-
-                if (shouldBeAlive)
-                {
-                    localNumberOfLivingCells++;
-                    personTag.IsAlive = true;
-
-                    var emissionGroup = GetComponentDataFromEntity<URPMaterialPropertyEmissionColor>(false);
-                    var emissionComponent = emissionGroup[entity];
-                    emissionComponent.Value = new float4(0.0001f, 0, 0, 1f);
-                    emissionGroup[entity] = emissionComponent;
-                }
-
-                else
-                {
-                    localNumberOfLivingCells--;
-                    personTag.IsAlive = false;
-
-                    var emissionGroup = GetComponentDataFromEntity<URPMaterialPropertyEmissionColor>(false);
-                    var emissionComponent = emissionGroup[entity];
-                    emissionComponent.Value = new float4(0.0001f, 0, 0, 1f);
-                    emissionGroup[entity] = emissionComponent;
-                }
-            }
         }).Run();
 
-        this.numberOfLivingCells = localNumberOfLivingCells;
-        this.shouldRunLifeLogic = shouldRunLifeLogic;
+        Entities.ForEach((Entity entity, ref PersonTag personTag) =>
+        {
+            personTag.IsAlive = personTag.shouldBeAlive;
+            var emissionGroup = GetComponentDataFromEntity<URPMaterialPropertyEmissionColor>(false);
+            var emissionComponent = emissionGroup[entity];
+
+            if (personTag.IsAlive)
+            {
+                emissionComponent.Value = new float4(0.1499598f, 0.8468735f, 0.8468735f, 1f);
+                emissionGroup[entity] = emissionComponent;
+            }
+            else
+            {
+                emissionComponent.Value = new float4(0.0001f, 0, 0, 1f);
+                emissionGroup[entity] = emissionComponent;
+            }
+        }).Run();
 
         entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
     }
