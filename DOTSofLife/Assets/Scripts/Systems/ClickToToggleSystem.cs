@@ -27,7 +27,7 @@ public class ClickToToggleSystem : SystemBase
     protected override void OnUpdate()
     {
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonDown(0))
         {
             SelectSingleUnit();
         }
@@ -50,6 +50,12 @@ public class ClickToToggleSystem : SystemBase
                 {
                     //make dead
                     EntityManager.RemoveComponent<LivingTag>(hitEntity);
+                    var emissionGroup = GetComponentDataFromEntity<URPMaterialPropertyEmissionColor>(false);
+                    var emissionComponent = emissionGroup[hitEntity];
+                    emissionComponent.Value.x = 0.0001f;
+                    emissionComponent.Value.y = 0;
+                    emissionComponent.Value.z = 0;
+                    emissionGroup[hitEntity] = emissionComponent;
                 }
                 else
                 {
