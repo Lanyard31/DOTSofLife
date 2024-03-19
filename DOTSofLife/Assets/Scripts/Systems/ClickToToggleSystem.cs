@@ -10,7 +10,6 @@ using UnityEngine;
 using System;
 using Unity.Rendering;
 using RaycastHit = Unity.Physics.RaycastHit;
-using UnityEngine.Rendering;
 
 [AlwaysUpdateSystem]
 public class ClickToToggleSystem : SystemBase
@@ -23,7 +22,6 @@ public class ClickToToggleSystem : SystemBase
     {
         _mainCamera = Camera.main;
         _buildPhysicsWorld = World.GetOrCreateSystem<BuildPhysicsWorld>();
-        GraphicsSettings.useScriptableRenderPipelineBatching = true;
     }
 
     protected override void OnUpdate()
@@ -60,30 +58,33 @@ public class ClickToToggleSystem : SystemBase
             if (EntityManager.HasComponent<PersonTag>(hitEntity))
             {
                 var personTag = EntityManager.GetComponentData<PersonTag>(hitEntity);
+                /*
                 if (personTag.IsAlive)
                 {
                     // Make dead
                     personTag.IsAlive = false;
                     EntityManager.SetComponentData(hitEntity, personTag);
                     
-                    var emissionGroup = GetComponentDataFromEntity<URPMaterialPropertyEmissionColor>(false);
+                    var emissionGroup = GetComponentDataFromEntity<URPMaterialPropertyBaseColor>(false);
                     var emissionComponent = emissionGroup[hitEntity];
                     emissionComponent.Value = new float4(0.0001f, 0, 0, 1f);
                     emissionGroup[hitEntity] = emissionComponent;
                 }
-                else
-                {
+                */
+                //else
+                //{
                     // Make alive
                     personTag.IsAlive = true;
                     EntityManager.SetComponentData(hitEntity, personTag);
 
                     Debug.Log("Should be alive and lighting up");
 
-                    var emissionGroup = GetComponentDataFromEntity<URPMaterialPropertyEmissionColor>(false);
+                    var emissionGroup = GetComponentDataFromEntity<URPMaterialPropertyBaseColor>(false);
                     var emissionComponent = emissionGroup[hitEntity];
                     emissionComponent.Value = new float4(0.1499598f, 0.8468735f, 0.8468735f, 1f);
                     emissionGroup[hitEntity] = emissionComponent;
-                }
+                //}
+                
             }
         }
     }

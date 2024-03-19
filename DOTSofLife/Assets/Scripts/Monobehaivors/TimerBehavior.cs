@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TimerBehavior : MonoBehaviour
 {
-    public float totalTime = 0.4f;
+    public float totalTime = 0.3f;
     private float currentTime;
     public bool isActive = false;
 

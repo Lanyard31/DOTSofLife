@@ -90,8 +90,10 @@ public class GenerationUpdateSystem : SystemBase
 
         Entities.ForEach((Entity entity, ref PersonTag personTag) =>
         {
+            
             personTag.IsAlive = personTag.shouldBeAlive;
-            var emissionGroup = GetComponentDataFromEntity<URPMaterialPropertyEmissionColor>(false);
+            
+            var emissionGroup = GetComponentDataFromEntity<URPMaterialPropertyBaseColor>(false);
             var emissionComponent = emissionGroup[entity];
 
             if (personTag.IsAlive)
@@ -104,6 +106,7 @@ public class GenerationUpdateSystem : SystemBase
                 emissionComponent.Value = new float4(0.0001f, 0, 0, 1f);
                 emissionGroup[entity] = emissionComponent;
             }
+            
         }).Run();
 
         entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
